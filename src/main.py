@@ -1,4 +1,7 @@
 import time
+import os
+import platform
+import sys
 from datetime import datetime
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, Request, Form
@@ -8,22 +11,21 @@ from sqlmodel import select
 from src.data.db import init_db, get_session, Session
 from src.models.videojuego import Videojuego
 
-
 templates = Jinja2Templates(directory="src/templates")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print(" DOCKER: Arrancando la aplicación...")
+    print("DOCKER: Arrancando la aplicación...")
     for _ in range(10):
         try:
             init_db()
-            print(" DOCKER: Base de datos conectada.")
+            print("DOCKER: Base de datos conectada.")
             break
         except Exception as e:
-            print(" Esperando a la Base de Datos...")
+            print("⏳ Esperando a la Base de Datos...")
             time.sleep(2)
     yield
-    print(" Apagando...")
+    print("Apagando...")
 
 app = FastAPI(lifespan=lifespan)
 
@@ -37,22 +39,47 @@ def ver_pagina_juegos(request: Request, session: Session = Depends(get_session))
         return f"<h1>Error: {str(e)}</h1>"
 
 
+@app.get("/estadisticas", response_class=HTMLResponse)
+def ver_estadisticas(request: Request, session: Session = Depends(get_session)):
+    juegos = session.exec(select(Videojuego)).all()
+    
+    total = len(juegos)
+    multi = sum(1 for j in juegos if j.es_multijugador)
+    solo = total - multi
+
+    return templates.TemplateResponse("estadisticas.html", {
+        "request": request,
+        "total": total,
+        "multi": multi,
+        "solo": solo
+    })
+
+
+@app.get("/sistema", response_class=HTMLResponse)
+def ver_info_sistema(request: Request):
+    
+    db_port = os.getenv("DB_PORT", "3306")
+    motor = "PostgreSQL " if str(db_port) == "5432" else "MySQL "
+    entorno = "Nube (Render) " if os.getenv("RENDER") else "Local / Docker "
+
+    datos_sistema = {
+        "hostname": platform.node(),
+        "os": f"{platform.system()} {platform.release()}",
+        "python_ver": sys.version.split()[0],
+        "db_engine": motor,
+        "entorno": entorno
+    }
+    return templates.TemplateResponse("sistema.html", {"request": request, "sistema": datos_sistema})
+
+#
 @app.get("/juego/{juego_id}", response_class=HTMLResponse)
 def ver_detalle_juego(juego_id: int, request: Request, session: Session = Depends(get_session)):
     juego = session.get(Videojuego, juego_id)
-    if not juego:
-        return "<h1>Juego no encontrado</h1>"
+    if not juego: return "<h1>No encontrado</h1>"
     return templates.TemplateResponse("detalle_juego.html", {"request": request, "juego": juego})
 
-
 @app.post("/juego/{juego_id}")
-async def actualizar_juego(
-    juego_id: int,
-    titulo: str = Form(...),
-    fecha_lanzamiento: str = Form(...),
-    es_multijugador: bool = Form(False),
-    session: Session = Depends(get_session)
-):
+async def actualizar_juego(juego_id: int, titulo: str = Form(...), fecha_lanzamiento: str = Form(...), es_multijugador: bool = Form(False), session: Session = Depends(get_session)):
     juego = session.get(Videojuego, juego_id)
     if juego:
         juego.titulo = titulo
@@ -60,31 +87,15 @@ async def actualizar_juego(
         juego.es_multijugador = es_multijugador
         session.add(juego)
         session.commit()
-    
     return RedirectResponse(url="/", status_code=303)
 
-
 @app.get("/nuevo", response_class=HTMLResponse)
-def formulario_nuevo_juego(request: Request):
+def formulario_nuevo(request: Request):
     return templates.TemplateResponse("crear_juego.html", {"request": request})
 
-
 @app.post("/crear")
-async def crear_juego_nuevo(
-    titulo: str = Form(...),
-    fecha_lanzamiento: str = Form(...),
-    es_multijugador: bool = Form(False),
-    session: Session = Depends(get_session)
-):
-    
-    nuevo_juego = Videojuego(
-        titulo=titulo,
-        fecha_lanzamiento=datetime.strptime(fecha_lanzamiento, '%Y-%m-%d').date(),
-        es_multijugador=es_multijugador
-    )
-    
-    
-    session.add(nuevo_juego)
+async def crear_juego(titulo: str = Form(...), fecha_lanzamiento: str = Form(...), es_multijugador: bool = Form(False), session: Session = Depends(get_session)):
+    nuevo = Videojuego(titulo=titulo, fecha_lanzamiento=datetime.strptime(fecha_lanzamiento, '%Y-%m-%d').date(), es_multijugador=es_multijugador)
+    session.add(nuevo)
     session.commit()
-    
     return RedirectResponse(url="/", status_code=303)

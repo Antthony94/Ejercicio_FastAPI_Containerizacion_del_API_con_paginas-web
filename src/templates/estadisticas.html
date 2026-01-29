@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Estadísticas de la Colección</title>
+    <style>
+        :root { --bg-color: #F5F5F7; --card-bg: #FFFFFF; --text-primary: #1D1D1F; --accent-blue: #0071E3; --radius-xl: 24px; --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { font-family: var(--font-stack); background-color: var(--bg-color); padding: 40px; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        
+        h1 { margin-bottom: 40px; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--radius-xl);
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .number { font-size: 64px; font-weight: 700; color: var(--accent-blue); display: block; margin-bottom: 10px; }
+        .label { font-size: 18px; color: #86868B; font-weight: 600; }
+        .btn-back { margin-top: 50px; text-decoration: none; color: var(--accent-blue); font-weight: 500; }
+    </style>
+</head>
+<body>
+    <h1>Estadísticas de tu Colección</h1>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="number">{{ total }}</span>
+            <span class="label">Juegos Totales</span>
+        </div>
+        <div class="stat-card">
+            <span class="number">{{ multi }}</span>
+            <span class="label">Multijugador</span>
+        </div>
+        <div class="stat-card">
+            <span class="number">{{ solo }}</span>
+            <span class="label">Solo Campaña</span>
+        </div>
+    </div>
+
+    <a href="/" class="btn-back">← Volver al inicio</a>
+</body>
+</html>
