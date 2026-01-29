@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Videojuego</title>
+    <style>
+        :root {
+            --bg-color: #F5F5F7;
+            --card-bg: #FFFFFF;
+            --text-primary: #1D1D1F;
+            --accent-blue: #0071E3;
+            --success-green: #34C759;
+            --radius-xl: 24px;
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-stack);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card-detail {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 { margin-bottom: 20px; font-size: 24px; text-align: center; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; }
+        
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d2d2d7;
+            border-radius: 12px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: var(--success-green); /* Verde para crear */
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .btn-back {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            text-decoration: none;
+            color: var(--accent-blue);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card-detail">
+        <h1>✨ Añadir Nuevo Juego</h1>
+        
+        <form action="/crear" method="post">
+            <div class="form-group">
+                <label>Título del Juego</label>
+                <input type="text" name="titulo" placeholder="Ej: FIFA 24" required>
+            </div>
+
+            <div class="form-group">
+                <label>Fecha de Lanzamiento</label>
+                <input type="date" name="fecha_lanzamiento" required>
+            </div>
+
+            <div class="form-group checkbox-group">
+                <input type="checkbox" name="es_multijugador" id="multi">
+                <label for="multi">Es Multijugador</label>
+            </div>
+
+            <button type="submit" class="btn">Crear Juego</button>
+        </form>
+
+        <a href="/" class="btn-back">Cancelar y volver</a>
+    </div>
+
+</body>
+</html>

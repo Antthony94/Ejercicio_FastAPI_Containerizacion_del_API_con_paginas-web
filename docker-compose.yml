@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # SERVICIO 1:
+  db:
+    image: postgres:15
+    container_name: postgres_container_videojuegos
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: videojuegos_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # SERVICIO 2
+  web:
+    build: .
+    container_name: fastapi_app_videojuegos
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432         
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: videojuegos_db
+
+volumes:
+  postgres_data:
