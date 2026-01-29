@@ -1,4 +1,4 @@
-# 🚀 Documentación del Despliegue en Render
+# Documentación del Despliegue en Render
 
 Este documento detalla el proceso completo llevado a cabo para desplegar la arquitectura de microservicios (API FastAPI + Base de Datos PostgreSQL) en la plataforma en la nube **Render.com**.
 
